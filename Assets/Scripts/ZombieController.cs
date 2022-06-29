@@ -5,6 +5,7 @@ using UnityEngine;
 public class ZombieController : MonoBehaviour
 {
     public int zombieHealth = 3;
+    public int damgeToPlayer = 1;
     public float destroyTime = 2f;
 
     private Animator shootAnim;
@@ -18,6 +19,11 @@ public class ZombieController : MonoBehaviour
 
     private float lastAttackTime = 0;
     private float lastShootenTime = 0;
+
+    private AudioSource zombieSound;
+    public AudioClip zombieDeadSound;
+
+    private GameObject player;
 
     public bool IsShooten
     {
@@ -40,6 +46,9 @@ public class ZombieController : MonoBehaviour
         IsShooten = false;
         IsDeath = false;
         isAttack = false;
+
+        zombieSound = gameObject.GetComponent<AudioSource>();
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     void DeathAnim(bool isDeath)
@@ -71,6 +80,8 @@ public class ZombieController : MonoBehaviour
     public void GetHit(int damge)
     {
         IsShooten = true;
+
+        zombieSound.Play();
         
         zombieHealth -= damge;
         
@@ -92,8 +103,15 @@ public class ZombieController : MonoBehaviour
 
     void Dead()
     {
+        
         isDeath = true;
         DeathAnim(isDeath);
+        zombieSound.clip = zombieDeadSound;
+
+        gameObject.GetComponent<BoxCollider>().enabled = false;
+
+        zombieSound.Play();
+
         gameObject.GetComponent<Movement>().enabled = false;
         Destroy(gameObject, destroyTime);
     }
@@ -103,6 +121,7 @@ public class ZombieController : MonoBehaviour
         if(Time.time >= lastAttackTime + attackTime)
         {
             AttackAnim(true);
+            player.GetComponent<PlayerController>().GetHit(damgeToPlayer);
             UpdateAttackTime();
         }
         else

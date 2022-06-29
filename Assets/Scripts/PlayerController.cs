@@ -7,6 +7,17 @@ public class PlayerController : MonoBehaviour
     public int damge = 0;
     public float fireTime = 0.3f;
     private float lastFireTime = 0;
+    public int playerHeath = 10;
+
+    public GameObject smoke;
+    public GameObject gunHead;
+    public GameObject gameManager;
+
+    private AudioSource playerSound;
+    public AudioClip playerHurt;
+    public AudioClip playerDeath;
+
+    private bool isTurnLight;
 
     private Animator gunShootAnim;
 
@@ -15,6 +26,10 @@ public class PlayerController : MonoBehaviour
     {
         UpdateFireTime();
         gunShootAnim = gameObject.GetComponent<Animator>();
+        isTurnLight = false;
+
+        playerSound = gameObject.GetComponent<AudioSource>();
+        gameManager = GameObject.FindGameObjectWithTag("GameController");
     }
 
     void UpdateFireTime()
@@ -26,6 +41,26 @@ public class PlayerController : MonoBehaviour
     void SetFireAnim(bool isFire)
     {
         gunShootAnim.SetBool("isFire", isFire);
+    }
+
+    public void GetHit(int damge)
+    {
+        playerSound.clip = playerHurt;
+        playerSound.Play();
+        playerHeath -= damge;
+
+        if (playerHeath <= 0)
+        {
+            Dead();
+        }
+    }
+
+    void Dead()
+    {
+
+        playerSound.clip = playerDeath;
+        playerSound.Play();
+        gameManager.GetComponent<GameManager>().EndGame();
     }
 
     void Fire()
@@ -47,10 +82,11 @@ public class PlayerController : MonoBehaviour
 
 
             SetFireAnim(true);
+            InsSmoke();
             if (Physics.Raycast(ray, out hit))
             {
                 if (hit.transform.tag.Equals("Enemy"))
-                {
+                { 
                     hit.transform.gameObject.GetComponent<ZombieController>().GetHit(damge);
                 }
             }
@@ -64,9 +100,36 @@ public class PlayerController : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// bat tat tia laze cua sung bang phim F
+    /// </summary>
+    void SettingLight()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            isTurnLight = !isTurnLight;
+            if (isTurnLight)
+            {
+                gunHead.gameObject.GetComponent<Light>().enabled = true;
+            }
+            else
+            {
+                gunHead.gameObject.GetComponent<Light>().enabled = false;
+            }
+        }
+        
+    }
+
+    void InsSmoke()
+    {
+        GameObject sm = Instantiate(smoke, gunHead.transform.position, gunHead.transform.rotation) as GameObject;
+        Destroy(sm, 0.5f);
+    }
+
     // Update is called once per frame
     void Update()
     {
         Fire();
+        SettingLight();
     }
 }
