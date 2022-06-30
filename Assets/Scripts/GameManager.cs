@@ -8,22 +8,23 @@ public class GameManager : MonoBehaviour
 {
     public GameObject menu;
     public GameObject inGamePanel;
+    public GameObject pauseGame;
+
     public Text txt_Point;
     public Text txt_PointEndGame;
     private int currentPoint = 0;
-    // Start is called before the first frame update
-    void Start()
+
+    private void Awake()
     {
         Time.timeScale = 1;
         menu.SetActive(false);
+        pauseGame.SetActive(false);
         inGamePanel.SetActive(true);
-        txt_Point.gameObject.SetActive(true);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        PauseGame();
     }
 
     public void GetPoint(int point)
@@ -37,11 +38,30 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    public void PauseGame()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Time.timeScale = 0;
+            pauseGame.SetActive(true);
+        }
+    }
+
+    public void ResumeGame()
+    {
+        Time.timeScale = 1;
+        pauseGame.SetActive(false);
+    }
+
     public void EndGame()
     {
         menu.SetActive(true);
         inGamePanel.SetActive(false);
-        txt_Point.gameObject.SetActive(false);
         txt_PointEndGame.text = txt_Point.text;
         Time.timeScale = 0;
     }
