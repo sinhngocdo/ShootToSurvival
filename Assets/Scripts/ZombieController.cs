@@ -24,6 +24,7 @@ public class ZombieController : MonoBehaviour
     public AudioClip zombieDeadSound;
 
     private GameObject player;
+    private GameObject gameController;
 
     public bool IsShooten
     {
@@ -49,6 +50,7 @@ public class ZombieController : MonoBehaviour
 
         zombieSound = gameObject.GetComponent<AudioSource>();
         player = GameObject.FindGameObjectWithTag("Player");
+        gameController = GameObject.FindGameObjectWithTag("GameController");
     }
 
     void DeathAnim(bool isDeath)
@@ -113,6 +115,7 @@ public class ZombieController : MonoBehaviour
         zombieSound.Play();
 
         gameObject.GetComponent<Movement>().enabled = false;
+        gameController.gameObject.GetComponent<GameManager>().GetPoint(1);
         Destroy(gameObject, destroyTime);
     }
 

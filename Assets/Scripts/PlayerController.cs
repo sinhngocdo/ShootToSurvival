@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public float fireTime = 0.3f;
     private float lastFireTime = 0;
     public int playerHeath = 10;
+    private int playerCurrentHeatlh;
 
     public GameObject smoke;
     public GameObject gunHead;
@@ -16,6 +18,8 @@ public class PlayerController : MonoBehaviour
     private AudioSource playerSound;
     public AudioClip playerHurt;
     public AudioClip playerDeath;
+
+    public Slider healthBar;
 
     private bool isTurnLight;
 
@@ -27,9 +31,14 @@ public class PlayerController : MonoBehaviour
         UpdateFireTime();
         gunShootAnim = gameObject.GetComponent<Animator>();
         isTurnLight = false;
+        playerCurrentHeatlh = playerHeath;
 
         playerSound = gameObject.GetComponent<AudioSource>();
         gameManager = GameObject.FindGameObjectWithTag("GameController");
+
+        healthBar.maxValue = playerHeath;
+        healthBar.value = playerCurrentHeatlh;
+        healthBar.minValue = 0;
     }
 
     void UpdateFireTime()
@@ -47,9 +56,10 @@ public class PlayerController : MonoBehaviour
     {
         playerSound.clip = playerHurt;
         playerSound.Play();
-        playerHeath -= damge;
+        playerCurrentHeatlh -= damge;
+        healthBar.value = playerCurrentHeatlh;
 
-        if (playerHeath <= 0)
+        if (playerCurrentHeatlh <= 0)
         {
             Dead();
         }
